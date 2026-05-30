@@ -4,7 +4,8 @@ const User = require('../models/User');
 const Team = require('../models/Team'); 
 const emailService = require('../utils/emailService');
 
-const GOOGLE_CLIENT_ID = "170566306205-mesjp20nf05b3ilkbl67jpvmfig4qgon.apps.googleusercontent.com";
+// ✨ AGORA PUXA DIRETO DO .ENV DE FORMA SEGURA
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 exports.googleLogin = async (req, res) => {
@@ -24,7 +25,6 @@ exports.googleLogin = async (req, res) => {
 
     // --- CASO ESPECIAL: Usuário pendente que bate com um convite de equipe ---
     if (user && user.status === 'pendente') {
-      // ✨ CORREÇÃO: Busca Case-Insensitive (Ignora Maiúsculas/Minúsculas)
       const convite = await Team.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
       if (convite) {
         user.status = 'aprovado'; 
@@ -42,7 +42,6 @@ exports.googleLogin = async (req, res) => {
     // --- CASO 1: SE O USUÁRIO NÃO EXISTIR NO BANCO ---
     if (!user) {
   
-      // ✨ CORREÇÃO: Busca Case-Insensitive (Ignora Maiúsculas/Minúsculas)
       const convite = await Team.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
       
       if (convite) {
@@ -68,7 +67,7 @@ exports.googleLogin = async (req, res) => {
           name: name,
           email: email,
           status: 'pendente',
-          role: 'patrao' // Seu enum aceita 'patrao' por padrão
+          role: 'patrao' 
         });
         await user.save();
 
@@ -81,7 +80,7 @@ exports.googleLogin = async (req, res) => {
       }
     }
 
-    // Se continuar pendente e sem convite, bloqueia direto (sem delay de e-mail)
+    // Se continuar pendente e sem convite, bloqueia direto
     if (user.status === 'pendente') {
       return res.status(403).json({ message: 'Conta em análise.' });
     }
