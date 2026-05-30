@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - Planner SaaS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; padding: 2rem;">
+
+  <div id="tela-senha" style="background:var(--surface); padding:2.5rem; border-radius:var(--rl); border:1px solid var(--b); text-align:center; width:100%; max-width:400px;">
+    <h2 style="font-family:'DM Mono', monospace; color:#f09595; margin-bottom:1rem; font-size:18px;">Área Restrita (Admin)</h2>
+    <input type="password" id="senha-admin" placeholder="Digite a senha" style="width:100%; padding:10px; margin-bottom:15px; background:var(--s2); border:1px solid var(--bm); border-radius:var(--r); color:var(--tx); text-align:center; font-family:monospace;">
+    <button class="btn primary" style="width:100%; padding:10px;" onclick="acessarAdmin()">Entrar</button>
+  </div>
+
+  <div id="tela-dashboard" style="display:none; background:var(--surface); padding:2rem; border-radius:var(--rl); border:1px solid var(--b); width:100%; max-width:600px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h2 style="font-family:'DM Mono', monospace; color:var(--tx); font-size:16px;">Solicitações de Acesso</h2>
+      <button class="btn xs ghost" onclick="sairAdmin()">Sair</button>
+    </div>
+    
+    <div id="lista-pendentes" style="display:flex; flex-direction:column; gap:10px;">
+      </div>
+  </div>
+  <script src="js/toast.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

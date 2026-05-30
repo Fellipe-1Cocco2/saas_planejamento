@@ -1,0 +1,23 @@
+Módulos do Node
+
+node_modules/
+
+Variáveis de Ambiente (MUITO IMPORTANTE NÃO SUBIR)
+
+.env
+
+Credenciais e Arquivos de Segurança Google
+
+client_secret_170566306205-mesjp20nf05b3ilkbl67jpvmfig4qgon.apps.googleusercontent.com.json
+
+Arquivos Específicos Restritos
+
+saas.html
+frontend/saas.html
+
+Logs e Arquivos de Sistema (Padrão)
+
+npm-debug.log
+yarn-error.log
+.DS_Store
+Thumbs.db

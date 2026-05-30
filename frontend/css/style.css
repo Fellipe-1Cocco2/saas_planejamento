@@ -1,0 +1,144 @@
+/* =========================================
+   1. VARIÁVEIS E RESET GLOBAL
+========================================= */
+:root {
+  --bg: #0f0f0e; --surface: #181817; --s2: #222220; --s3: #2a2a28;
+  --b: rgba(255,255,255,.07); --bm: rgba(255,255,255,.13); --bl: rgba(255,255,255,.22);
+  --tx: #e8e7e2; --tm: #8a8980; --tf: #3e3e3a;
+  --r: 8px; --rl: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--tx); -webkit-font-smoothing: antialiased; }
+
+/* =========================================
+   2. BOTÕES
+========================================= */
+.btn { padding: 7px 15px; border-radius: var(--r); border: 1px solid var(--bm); background: transparent; color: var(--tx); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.btn:hover { background: var(--s2); border-color: var(--bl); }
+.btn.primary { background: var(--tx); color: var(--bg); border-color: var(--tx); font-weight: 500; }
+.btn.primary:hover { opacity: .85; }
+.btn.sm { padding: 4px 11px; font-size: 12px; }
+.btn.xs { padding: 2px 8px; font-size: 11px; }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--tm); }
+.btn.ghost:hover { background: var(--s2); color: var(--tx); border-color: var(--b); }
+.btn.danger { background: #2a1010; color: #f09595; border-color: #4a1c1c; }
+.btn.danger:hover { background: #3a1515; }
+
+/* =========================================
+   3. TOASTS E AVISOS FIXOS
+========================================= */
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: var(--surface); color: var(--tx); padding: 15px 20px; border-radius: var(--r); min-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); position: relative; overflow: hidden; display: flex; gap: 12px; border: 1px solid var(--b); border-left: 4px solid transparent; animation: slideIn 0.3s ease forwards; }
+.toast-icon { font-size: 18px; margin-top: -2px; }
+.toast-message { font-size: 13px; font-family: 'DM Sans', sans-serif; flex: 1; line-height: 1.5; }
+.toast.success { border-left-color: #6daa40; } .toast.success .toast-icon { color: #6daa40; }
+.toast.error { border-left-color: #f09595; } .toast.error .toast-icon { color: #f09595; }
+.toast.warning { border-left-color: #d4a843; } .toast.warning .toast-icon { color: #d4a843; }
+.toast.info { border-left-color: #5ba3e8; } .toast.info .toast-icon { color: #5ba3e8; }
+.toast-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(255,255,255,0.1); width: 100%; }
+.toast-progress-bar { height: 100%; width: 100%; animation: toastProgress linear forwards; }
+.toast.success .toast-progress-bar { background: #6daa40; }
+.toast.error .toast-progress-bar { background: #f09595; }
+.toast.warning .toast-progress-bar { background: #d4a843; }
+.toast.info .toast-progress-bar { background: #5ba3e8; }
+
+.bottom-alert { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2a1010; border: 1px solid #4a1c1c; padding: 15px 25px; border-radius: var(--rl); z-index: 9999; display: flex; gap: 15px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transition: opacity 0.4s, bottom 0.4s; color: #f09595; font-size: 14px; font-weight: 500; }
+.bottom-alert.hidden { opacity: 0; bottom: -50px; pointer-events: none; }
+.close-btn-alert { background: transparent; border: none; color: #f09595; font-size: 16px; cursor: pointer; opacity: 0.6; margin-left: 10px; }
+.close-btn-alert:hover { opacity: 1; }
+
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
+
+/* =========================================
+   4. LAYOUT
+========================================= */
+#loader { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(15, 15, 14, 0.85); backdrop-filter: blur(4px); align-items: center; justify-content: center; flex-direction: column; gap: 15px; color: var(--tx); font-family: 'DM Mono', monospace; }
+#conteudo-app { display: none; }
+header { background: var(--surface); border-bottom: 1px solid var(--b); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 54px; position: sticky; top: 0; z-index: 200; }
+.logo-text { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--tm); }
+.user-menu { display: flex; gap: 10px; align-items: center; font-size: 13px; color: var(--tm); }
+main { max-width: 1300px; margin: 0 auto; padding: 1.75rem 1.5rem; }
+
+.top-nav { display: flex; gap: 20px; }
+.top-nav a { color: var(--tm); text-decoration: none; font-size: 13px; padding: 18px 0; border-bottom: 2px solid transparent; transition: all 0.2s; }
+.top-nav a:hover { color: var(--tx); }
+.top-nav a.active { color: var(--tx); border-bottom-color: var(--tx); font-weight: 500; }
+.aba-conteudo { animation: modalFadeIn 0.2s ease-out forwards; }
+
+.company-bar { background: var(--surface); border: 1px solid var(--b); border-radius: var(--rl); padding: 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.company-select-wrapper { display: flex; gap: 10px; align-items: center; }
+.company-select-wrapper select { min-width: 200px; }
+.empty-state { text-align: center; padding: 3rem; color: var(--tm); border: 1px dashed var(--bm); border-radius: var(--rl); }
+
+/* =========================================
+   5. LISTA DE TAREFAS (BORDAS DE CATEGORIAS)
+========================================= */
+.task-list-item { 
+  background: var(--bg); border: 1px solid var(--b); border-radius: var(--r); 
+  border-left: 3px solid #666; padding: 12px 15px; display: flex; 
+  flex-direction: column; gap: 8px; transition: border-color 0.2s; 
+}
+.task-list-item:hover { border-color: var(--bm); }
+
+/* ✨ MOTOR DE BORDAS POR CATEGORIA (LISTA) */
+.task-list-item.cat-cliente  { border-left-color: #3b71ca; }
+.task-list-item.cat-estudo   { border-left-color: #9c27b0; }
+.task-list-item.cat-comercial { border-left-color: #d4a843; }
+.task-list-item.cat-reuniao  { border-left-color: #6daa40; }
+.task-list-item.done { border-left-color: #4a6e31 !important; background: rgba(109, 170, 64, 0.02); }
+
+.task-tags { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+.tag { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; }
+
+/* Enfeites das pequenas Tags internas */
+.tag.cat { background: rgba(255, 255, 255, 0.04); color: var(--tx); border: 1px solid var(--b); }
+.tag.prio { background: rgba(255, 255, 255, 0.02); color: var(--tm); border: 1px solid var(--b); }
+.tag.time { background: rgba(255, 255, 255, 0.05); color: var(--tm); font-family: 'DM Mono', monospace; }
+
+/* =========================================
+   6. GRADE DO CALENDÁRIO MENSAL
+========================================= */
+.month-grid-container { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(105px, auto); gap: 8px; margin-bottom: 2rem; }
+.calendar-day-cell { background: var(--surface); border: 1px solid var(--b); border-radius: var(--r); padding: 8px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: all 0.15s; min-height: 105px; overflow: hidden; }
+.calendar-day-cell:hover { background: var(--s2); border-color: var(--bm); }
+.calendar-day-cell.other-month { opacity: 0.25; cursor: not-allowed; }
+.calendar-day-cell.today { border-color: #2f9e6b; background: rgba(47, 158, 107, 0.03); }
+.cell-date-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--tm); font-weight: 500; margin-bottom: 2px; }
+.calendar-day-cell.today .cell-date-num { color: #2f9e6b; font-weight: bold; }
+
+/* Micro-pílulas com Drag & Drop e Cores por Categoria */
+.micro-task-pill {
+  background: var(--bg); border: 1px solid var(--b); border-left: 2px solid #666;
+  border-radius: 4px; padding: 2px 6px; font-size: 11px; color: var(--tx);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+  user-select: none; -webkit-user-select: none;
+  cursor: -webkit-grab !important; cursor: grab !important; 
+}
+.micro-task-pill:active { cursor: -webkit-grabbing !important; cursor: grabbing !important; }
+
+/* ✨ MOTOR DE BORDAS POR CATEGORIA (CALENDÁRIO) */
+.micro-task-pill.cat-cliente  { border-left-color: #3b71ca; }
+.micro-task-pill.cat-estudo   { border-left-color: #9c27b0; }
+.micro-task-pill.cat-comercial { border-left-color: #d4a843; }
+.micro-task-pill.cat-reuniao  { border-left-color: #6daa40; }
+
+/* =========================================
+   7. FORMULÁRIOS E MODAIS
+========================================= */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.fg { display: flex; flex-direction: column; gap: 4px; }
+.fg.full { grid-column: 1 / -1; }
+.flabel { font-size: 11px; font-weight: 500; color: var(--tm); text-transform: uppercase; letter-spacing: .06em; }
+input, select, textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 10px; border: 1px solid var(--bm); border-radius: var(--r); background: var(--s2); color: var(--tx); width: 100%; }
+input:focus, select:focus, textarea:focus { border-color: var(--tm); outline: none; }
+.full-width { width: 100%; padding: 10px; }
+
+.modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.modal-content { background: var(--surface); border: 1px solid var(--b); border-radius: var(--rl); padding: 1.75rem; width: 90%; max-width: 400px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: modalFadeIn 0.2s ease-out forwards; }
+.modal-content.large { max-width: 550px; }
+.modal-title { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--tm); text-transform: uppercase; margin-bottom: 1rem; }
+.close-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--tm); font-size: 16px; cursor: pointer; }
+.close-btn:hover { color: var(--tx); }
+@keyframes modalFadeIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }

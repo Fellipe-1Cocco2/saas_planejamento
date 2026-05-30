@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Planner SaaS - Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div id="loader">
+    <div class="spinner" style="font-size:24px;">⏳</div>
+    <div id="loader-msg">Carregando sistema...</div>
+  </div>
+
+  <div id="alerta-atraso" class="bottom-alert hidden">
+    <div style="font-size: 18px;">🚨</div>
+    <div>Atenção! Você possui <strong id="qtd-atrasadas">0</strong> tarefa(s) em atraso precisando de revisão.</div>
+    <button class="close-btn-alert" onclick="fecharAlertaAtraso()">✕</button>
+  </div>
+
+  <div id="conteudo-app">
+    <header>
+      <div style="display: flex; align-items: center; gap: 30px;">
+        <div class="logo-text"><em>planner</em>/saas</div>
+        <nav class="top-nav">
+          <a href="#" id="nav-tarefas" class="active" onclick="mudarAba('tarefas')">Tarefas</a>
+          <a href="#" id="nav-planejamento" onclick="mudarAba('planejamento')">Planejamento</a>
+          <a href="#" id="nav-delegados" onclick="mudarAba('delegados')">Delegadas</a>
+          <a href="#" id="nav-historico" onclick="mudarAba('historico')">Histórico</a>
+          <a href="#" style="opacity: 0.4; cursor: not-allowed;">Depósito</a>
+        </nav>
+      </div>
+      <div class="user-menu">
+        <span id="user-display"></span>
+        <button class="btn xs ghost" onclick="abrirModalEquipe()">👥 Equipe</button>
+        <button class="btn xs danger" onclick="fazerLogout()">Sair</button>
+      </div>
+    </header>
+
+    <main>
+      <div id="barra-empresas" class="company-bar">
+        <div class="company-select-wrapper">
+          <span class="flabel">Empresa Ativa:</span>
+          <select id="select-empresa" onchange="alterarEmpresaAtiva()"></select>
+        </div>
+        <div class="action-buttons">
+          <button class="btn sm" onclick="abrirModalEmpresa()">+ Nova Empresa</button>
+        </div>
+      </div>
+
+      <div id="aviso-sem-empresa" class="empty-state">
+        Você não possui nenhuma empresa ativa. Crie uma empresa acima para começar.
+      </div>
+
+      <div id="aba-tarefas" class="aba-conteudo" style="display: none;">
+        <div style="margin-top: 1rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+          <div id="contador-tarefas" style="font-family: 'DM Mono', monospace; font-size: 12px; color: var(--tm);">0 tarefas</div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn sm" style="background:var(--s3); color:var(--tx); border-color:var(--b);" onclick="distribuirTarefasInfinitas()">🪄 Auto-Organizar</button>
+            <button class="btn sm primary" onclick="abrirModalTarefaSemData()">+ Nova Tarefa no Backlog</button>
+          </div>
+        </div>
+        <div id="lista-tarefas-vertical" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <div id="aba-planejamento" class="aba-conteudo" style="display: none;">
+        <div class="calendar-controls" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2 id="nome-mes-atual" style="font-size:18px; font-weight:500; text-transform:capitalize;">Mês</h2>
+          <div style="display:flex; gap:10px;">
+            <button class="btn sm" onclick="navegarMes(-1)">◀ Voltar</button>
+            <button class="btn sm" onclick="navegarMes(1)">Avançar ▶</button>
+          </div>
+        </div>
+        <div class="calendar-grid-header" style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; text-align:center; margin-bottom:8px;">
+          <div class="flabel">Dom</div><div class="flabel">Seg</div><div class="flabel">Ter</div>
+          <div class="flabel">Qua</div><div class="flabel">Qui</div><div class="flabel">Sex</div><div class="flabel">Sáb</div>
+        </div>
+        <div id="calendar-month-grid" class="month-grid-container"></div>
+        
+        <div id="modal-dia-expandido" class="modal" style="display:none; z-index: 1100;">
+          <div class="modal-content" style="max-width:500px;">
+            <button class="close-btn" onclick="fecharModalDia()">✕</button>
+            <div class="modal-title" id="modal-dia-titulo">Tarefas do Dia</div>
+            <div id="modal-dia-tarefas-lista" style="display:flex; flex-direction:column; gap:10px; max-height:350px; overflow-y:auto; padding-right:5px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="aba-delegados" class="aba-conteudo" style="display: none;">
+        <div style="margin-top: 1rem; margin-bottom: 2rem;">
+          <div id="contador-delegadas" style="font-family: 'DM Mono', monospace; font-size: 12px; color: var(--tm);">0 tarefas delegadas</div>
+        </div>
+        <div id="lista-tarefas-delegadas" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <div id="aba-historico" class="aba-conteudo" style="display: none;">
+        <div style="margin-top: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div id="contador-historico" style="font-family: 'DM Mono', monospace; font-size: 12px; color: var(--tm);">0 tarefas concluídas no total</div>
+        </div>
+
+        <div style="background: var(--surface); border: 1px solid var(--b); border-radius: var(--r); padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+          <div style="display:flex; gap: 10px;">
+            <button id="btn-filtro-unica" class="btn sm primary" onclick="mudarTipoFiltro('unica')">Data Única</button>
+            <button id="btn-filtro-range" class="btn sm ghost" onclick="mudarTipoFiltro('range')">Range de Data</button>
+          </div>
+          <div style="display:flex; gap: 10px; align-items: center; flex: 1;">
+            <input type="date" id="filtro-data-1" style="max-width: 150px; padding: 6px;">
+            <span id="filtro-ate" style="display:none; color: var(--tm); font-size: 13px;">até</span>
+            <input type="date" id="filtro-data-2" style="max-width: 150px; display:none; padding: 6px;">
+            <button class="btn sm" style="background:#3b71ca; border-color:#3b71ca; color:#fff;" onclick="carregarTarefas()">🔍 Filtrar</button>
+            <button class="btn sm ghost" onclick="limparFiltroHistorico()">✕ Limpar</button>
+          </div>
+        </div>
+
+        <div id="lista-tarefas-historico" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <div id="modal-empresa" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="fecharModalEmpresa()">✕</button>
+      <div class="modal-title">Nova Empresa</div>
+      <div class="fg" style="margin-bottom:1.5rem;">
+        <div class="flabel">Nome da Empresa</div>
+        <input type="text" id="novo-nome-empresa" placeholder="Ex: Corporação Estark">
+      </div>
+      <button class="btn primary full-width" onclick="criarEmpresa()">Salvar Empresa</button>
+    </div>
+  </div>
+
+  <div id="modal-tarefa" class="modal">
+    <div class="modal-content large">
+      <button class="close-btn" onclick="fecharModalTarefa()">✕</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div class="modal-title">Adicionar Tarefa</div>
+        <div id="tag-dia-selecionado" style="font-family:'DM Mono',monospace; font-size:12px; padding:4px 10px; border-radius:4px;">No Backlog</div>
+      </div>
+      <div class="form-grid">
+        <div class="fg full">
+          <div class="flabel">Empresa / Projeto</div>
+          <select id="f-empresa-modal"></select>
+        </div>
+        <div class="fg full">
+          <div class="flabel">Tarefa</div>
+          <input type="text" id="f-nome" placeholder="Ex: Ajustar banco de dados">
+        </div>
+        <div class="fg">
+          <div class="flabel">Categoria</div>
+          <select id="f-cat">
+            <option value="CLIENTE">Cliente</option>
+            <option value="COMERCIAL">Comercial</option>
+            <option value="ESTUDO">Estudo</option>
+            <option value="REUNIAO">Reunião</option>
+          </select>
+        </div>
+        <div class="fg">
+          <div class="flabel">Delegar para</div>
+          <select id="f-delegar">
+            <option value="">Apenas para Mim (Padrão)</option>
+            </select>
+        </div>
+        <div class="fg">
+          <div class="flabel">Tempo total (min)</div>
+          <input type="number" id="f-tempo" placeholder="Ex: 120" min="5">
+        </div>
+        <div class="fg">
+          <div class="flabel">Prioridade</div>
+          <select id="f-prio">
+            <option value="P1">P1 — Crítico</option>
+            <option value="P2" selected>P2 — Importante</option>
+            <option value="P3">P3 — Se der</option>
+          </select>
+        </div>
+        <div class="fg full">
+          <div class="flabel">Observação</div>
+          <textarea id="f-obs" placeholder="Contexto..."></textarea>
+        </div>
+      </div>
+      <button class="btn primary full-width" onclick="validarCriacaoTarefa()">Continuar</button>
+    </div>
+  </div>
+
+  <div id="modal-prazo-delegada" class="modal" style="z-index: 1200;">
+    <div class="modal-content">
+      <button class="close-btn" onclick="voltarParaTarefa()">✕</button>
+      <div class="modal-title" style="color: #5ba3e8;">Definir Prazo da Delegação</div>
+      <div style="font-size:12px; color:var(--tm); margin-bottom: 15px;">Até que dia o funcionário deve finalizar 100% da entrega?</div>
+      <div class="fg full" style="margin-bottom: 20px;">
+        <div class="flabel">Data Limite (Prazo Final)</div>
+        <input type="date" id="f-prazo-delegada">
+      </div>
+      <button class="btn primary full-width" onclick="finalizarCriacaoTarefa()">Confirmar e Distribuir</button>
+    </div>
+  </div>
+
+  <div id="modal-nao-feito" class="modal" style="z-index: 1200;">
+    <div class="modal-content">
+      <button class="close-btn" onclick="fecharModalNaoFeito()">✕</button>
+      <div class="modal-title" style="color: #f09595;">Relatório de Falha (N/F)</div>
+      <div class="form-grid">
+        <div class="fg">
+          <div class="flabel">% Concluída</div>
+          <input type="number" id="nf-porcentagem" placeholder="Ex: 50" min="0" max="99">
+        </div>
+        <div class="fg">
+          <div class="flabel">Motivo Real</div>
+          <select id="nf-motivo">
+            <option value="Imprevisto">Imprevisto</option>
+            <option value="Preguiça">Preguiça</option>
+            <option value="Dispersão">Dispersão</option>
+          </select>
+        </div>
+        <div class="fg full" style="margin-top: 10px;">
+          <div class="flabel">Reagendar para qual dia?</div>
+          <input type="date" id="nf-data">
+        </div>
+      </div>
+      <button class="btn danger full-width" onclick="salvarNaoFeito()">Registrar Falha e Reagendar</button>
+    </div>
+  </div>
+
+  <div id="modal-macro" class="modal" style="z-index: 1150;">
+    <div class="modal-content large">
+      <button class="close-btn" onclick="fecharModalMacro()">✕</button>
+      <div class="modal-title" id="macro-titulo">Visão Macro</div>
+      <div style="grid-template-columns: 1fr 1fr 1fr; display: grid; gap: 10px; margin-bottom: 15px;">
+        <div style="background:var(--bg); border:1px solid var(--b); padding:10px; border-radius:var(--r);">
+          <div class="flabel">TEMPO TOTAL</div><div id="macro-total" style="font-size:18px; color:var(--tx); font-weight:500;">0h</div>
+        </div>
+        <div style="background:var(--bg); border:1px solid var(--b); padding:10px; border-radius:var(--r);">
+          <div class="flabel">PROGRESSO</div><div id="macro-progresso" style="font-size:18px; color:#6daa40; font-weight:500;">0%</div>
+        </div>
+        <div style="background:var(--bg); border:1px solid var(--b); padding:10px; border-radius:var(--r);">
+          <div class="flabel">STATUS (PRAZO)</div><div id="macro-status" style="font-size:14px; font-weight:500;">No prazo</div>
+        </div>
+      </div>
+      <div class="flabel" style="margin-bottom:8px;">Fatiamento do Funcionário:</div>
+      <div id="macro-lista-partes" style="display:flex; flex-direction:column; gap:8px; max-height: 250px; overflow-y:auto; padding-right: 5px;"></div>
+    </div>
+  </div>
+
+  <div id="modal-equipe" class="modal" style="z-index: 1200;">
+    <div class="modal-content large">
+      <button class="close-btn" onclick="fecharModalEquipe()">✕</button>
+      <div class="modal-title" style="color: #5ba3e8;">Equipe do Workspace</div>
+      <div style="font-size:12px; color:var(--tm); margin-bottom: 15px;">Adicione funcionários para delegar tarefas de qualquer empresa a eles.</div>
+      
+      <div style="display:flex; gap:10px; margin-bottom: 20px;">
+        <input type="email" id="f-email-convite" placeholder="E-mail do funcionário..." style="flex:1;">
+        <button class="btn primary" onclick="enviarConvite()">Enviar Convite</button>
+      </div>
+
+      <div class="flabel" style="margin-bottom:8px;">Membros Atuais:</div>
+      <div id="lista-membros-equipe" style="display:flex; flex-direction:column; gap:8px; max-height: 250px; overflow-y:auto; padding-right: 5px;">
+        </div>
+    </div>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
